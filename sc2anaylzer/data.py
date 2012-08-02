@@ -62,7 +62,7 @@ tracked_abilities = set([
 			'Concussive Shells',
             'Siege Tank',
             'Thor',
-            'Hellion'
+            'Hellion',
 			'Siege Tech',
 			'Infernal Pre-igniter',
 			'250mm Strike Cannons',
@@ -144,7 +144,7 @@ tracked_abilities = set([
             'Void Ray',
             'Charge',
             'Blink',
-            'Graviton Catapult'
+            'Graviton Catapult',
             'Khaydarin Amulet',
             'Psionic Storm',
             'Gravitic Booster',
