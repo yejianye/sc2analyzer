@@ -5,7 +5,7 @@ import argparse
 
 import sc2reader
 
-import sc2anaylzer.data 
+from .data import tracked_abilities
 
 def print_replay_stats(rep):
 	print '================'
@@ -26,7 +26,7 @@ def is_duplicated_events(e1, e2):
 	return str(e1) == str(e2)
 
 def get_player_events(player):
-	events = [e for e in player.events if isinstance(e, sc2reader.events.AbilityEvent) and e.ability in sc2anaylzer.data.tracked_abilities]
+	events = [e for e in player.events if isinstance(e, sc2reader.events.AbilityEvent) and e.ability in tracked_abilities]
 	# for duplicated events, we should only keep the last one
 	result = []
 	last_evt = None
@@ -47,7 +47,7 @@ def print_player_stats(player):
 def main():
 	parser = argparse.ArgumentParser(description='Extract game statistics from Starcraft 2 game replay files (.sc2replay)')
 	parser.add_argument('FILE', help='Starcraft2 replay file')
-	parser.add_argument('--player', type=int, default=0, help="The id of player you'd like to anaylze. 0 for all players.")
+	parser.add_argument('--player', type=int, default=0, help="The id of player you'd like to analyze. 0 for all players.")
 	parser.add_argument('--summary', default=False, action='store_true', help="Only print game summary")
 	args = parser.parse_args()
 	rep = sc2reader.load_replay(args.FILE)

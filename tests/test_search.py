@@ -1,4 +1,4 @@
-from sc2anaylzer import search
+from sc2analyzer import search
 
 replays = {
 	'1.sc2replay' : {

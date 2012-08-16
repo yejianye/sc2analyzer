@@ -1,13 +1,13 @@
 import setuptools, sys
 
 setuptools.setup(
-    name="sc2anaylzer",
+    name="sc2analyzer",
     version='0.1.0',
     license="MIT",
 
     author="Ryan Ye",
     author_email="yejianye@gmail.com",
-    url="https://github.com/yejianye/sc2anaylzer",
+    url="https://github.com/yejianye/sc2analyzer",
 
     description="Utility for anaylzing interesting events and statistics in Starcraft2 Replay files",
     long_description=open("README.txt").read(),
@@ -28,9 +28,10 @@ setuptools.setup(
         ],
     entry_points={
         'console_scripts': [
-            'sc2analyzer = sc2anaylzer.anaylzer:main',
+            'sc2analyzer = sc2analyzer.analyzer:main',
+            'sc2search = sc2analyzer.search:main',
         ]
     },
     install_requires=['sc2reader'],
-    packages=['sc2anaylzer'],
+    packages=['sc2analyzer', 'msgpack'],
 )
