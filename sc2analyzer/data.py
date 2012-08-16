@@ -1,3 +1,5 @@
+from sc2reader import events
+
 tracked_abilities = set([ 
 #Terran
             'Command Center',
@@ -290,7 +292,7 @@ tracked_building_orders = set([
     'Warp Gate',
     'Hallucination',
     'Charge',
-    'Blink',
+    ('Blink', events.SelfAbilityEvent),
     'Psionic Storm',
     'Gravitic Booster',
     'Gravitic Drive',

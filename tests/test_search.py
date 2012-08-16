@@ -1,3 +1,4 @@
+import os
 from sc2analyzer import search
 
 replays = {
@@ -123,3 +124,8 @@ def test_strategy():
 	assert len(reps) == 0 
 	reps = search.search(replays, ArgsMock(strategy=['TVZ: *, 2 Engineering Bay, * Supply Depot, Factory']))
 	assert len(reps) == 1 and reps[0]['filename'] == '1.sc2replay'
+
+def test_parse_replay():
+	fname = os.path.join(os.path.dirname(__file__), 'blink.sc2replay')
+	rep = search.ReplayDB.parse_replay(fname)
+	assert [e for e in rep['p1_building_order'] if e[1] == 'Blink'] == [(334, 'Blink')]

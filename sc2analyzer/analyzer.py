@@ -5,7 +5,7 @@ import argparse
 
 import sc2reader
 
-from .data import tracked_abilities
+from sc2analyzer.data import tracked_abilities
 
 def print_replay_stats(rep):
 	print '================'

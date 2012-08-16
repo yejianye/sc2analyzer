@@ -8,11 +8,12 @@ import shutil
 import shelve
 import msgpack
 import bisect
+import time
 from ConfigParser import ConfigParser
 from collections import OrderedDict
 import sc2reader
 
-from .data import tracked_building_orders
+from sc2analyzer.data import tracked_building_orders
 
 class InvalidQuantity(Exception):
 	pass
@@ -74,7 +75,6 @@ def search(replays, args):
 	if args.max_length:
 		filters.append(max_length_filter(args.max_length))
 	if args.comp_type:
-		print 'args.comp_type', args.comp_type
 		filters.append([comp_type_filter(c, args.win_only) for c in args.comp_type])
 	if args.strategy:
 		filters.append([strategy_filter(Strategy(s), args.win_only) for s in args.strategy])
@@ -107,7 +107,7 @@ class Strategy(object):
 		orig_item = item
 		item = item.strip()
 		if item == '*':
-			return '(.*#)*'
+			return '.*'
 
 		if item[0] == '*' or item[0].isdigit():
 			quantity, item = re.split(' +', item, 1)
@@ -156,10 +156,13 @@ class ReplayDB(object):
 		self.load()
 
 	def load(self):
-		self.data = {'version' : _version}
+		self.data = {'version' : self._version}
 		if os.path.exists(self.db_path):
 			with open(self.db_path) as f:
 				self.data = msgpack.unpack(f)
+		else:
+			print 'Initializing replay database...'
+			self.update()
 
 	def dump(self):
 		with open(self.db_path, 'w') as f:
@@ -171,26 +174,36 @@ class ReplayDB(object):
 	
 	@property
 	def replays(self):
-		return self.data.get('replays', {})
+		return self.data.setdefault('replays', {})
+
+	@property
+	def valid_replays(self):
+		return dict((k,v) for k,v in self.replays.iteritems() if not v.get('invalid'))
 		
 	def update(self):
 		modified = False
 		for root, dirs, filenames in os.walk(self.rep_path):
-			root = os.path.relpath(root, self.rep_path)
 			for fname in filenames:
 				fname = os.path.join(root, fname)
 				if fname.endswith('.sc2replay') and not self.replays.has_key(fname):
-					modified = True
-					self.replays[fname] = self.parse_replay(fname)
+					try:
+						self.replays[fname] = self.parse_replay(fname)
+						modified = True
+						print 'Added replay %s' % fname
+					except:
+						self.replays[fname] = {'invalid': 1}
+						print "Can't parse replay %s. Skip it." % fname
 		if modified:
 			self.dump()
 
-	def parse_replay(self, filename):
+	@classmethod
+	def parse_replay(cls, filename):
 		rep = sc2reader.load_replay(filename)
 		assert len(rep.players) == 2, 'Invalid number of players, only 1v1 game is supported'
 		info = {
+			'filename': rep.filename,
 			'map': rep.map_name,
-			'date': rep.date,
+			'date': time.mktime(rep.date.timetuple()),
 			'version': rep.release_string,
 			'length': rep.length.total_seconds(),
 			'winner': 'p%d' % (rep.winner.players[0].pid)
@@ -198,11 +211,12 @@ class ReplayDB(object):
 		for player in rep.players:
 			info['p%d_name' % player.pid] = player.name
 			info['p%d_race' % player.pid] = player.play_race
-			info['p%d_building_order'] = self.get_building_order(player.events) 
+			info['p%d_building_order' % player.pid] = cls.get_building_order(player.events) 
 		return info
 
-	def get_building_order(self, events):
-		events = [e for e in events if isinstance(e, sc2reader.events.AbilityEvent) and e.ability in tracked_building_orders]
+	@classmethod
+	def get_building_order(cls, events):
+		events = [e for e in events if isinstance(e, sc2reader.events.AbilityEvent) and (e.ability in tracked_building_orders or (e.ability, type(e)) in tracked_building_orders)]
 		# for duplicated events, we should only keep the last one
 		result = []
 		is_duplicated_events = lambda e1, e2: str(e1) == str(e2)
@@ -267,6 +281,7 @@ def main():
 		When used along with '--strategy', only find games in which the player using the specified stratey won""") 
 	parser.add_argument('--list-strategies', action='store_true', help='List all strategies and their definition.') 
 	parser.add_argument('--output-dir', type=str, help='If specified, copy all replays that matched search critiera to a directory.') 
+	parser.add_argument('--update-db', action='store_true', help='Update replay database. Adding new replays in rep_path to the database.') 
 	parser.add_argument('--config', type=str, default=Config.default_path, help='Specify configuration filename. Default config is at %s' % Config.default_path) 
 	args = parser.parse_args()
 
@@ -284,8 +299,9 @@ def main():
 		args.comp_type = args.comp_type.split(',')
 
 	db = ReplayDB(cfg.db_path, cfg.rep_path)
-	db.update()
-	matched = search(db.replays, args)
+	if args.update_db:
+		db.update()
+	matched = search(db.valid_replays, args)
 	print '\n'.join(rep['filename'] for rep in matched)
 	if args.output_dir:
 		if not os.path.exists(args.output_dir):
