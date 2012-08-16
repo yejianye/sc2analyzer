@@ -9,7 +9,7 @@ setuptools.setup(
     author_email="yejianye@gmail.com",
     url="https://github.com/yejianye/sc2analyzer",
 
-    description="Utility for anaylzing interesting events and statistics in Starcraft2 Replay files",
+    description="Utility for analyzing interesting events and statistics in Starcraft2 Replay files",
     long_description=open("README.txt").read(),
     keywords=["starcraft 2","sc2","replay"],
     classifiers=[

@@ -7,4 +7,4 @@ This script is used for extracting interesting game statistics from Starcraft 2 
 The script requires the latest version of sc2reader package (https://github.com/GraylinKim/sc2reader).
 
 Example usage:
-$ sc2anaylzer example.sc2replay
+$ sc2analyzer example.sc2replay
