@@ -32,6 +32,6 @@ setuptools.setup(
             'sc2search = sc2analyzer.search:main',
         ]
     },
-    install_requires=['sc2reader'],
-    packages=['sc2analyzer', 'msgpack'],
+    install_requires=['sc2reader >= 0.3.3', 'msgpack-python'],
+    packages=['sc2analyzer'],
 )

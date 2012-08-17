@@ -128,4 +128,5 @@ def test_strategy():
 def test_parse_replay():
 	fname = os.path.join(os.path.dirname(__file__), 'blink.sc2replay')
 	rep = search.ReplayDB.parse_replay(fname)
+	assert rep['p1_building_order'][0] == (49, 'Pylon')
 	assert [e for e in rep['p1_building_order'] if e[1] == 'Blink'] == [(334, 'Blink')]

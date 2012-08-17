@@ -82,6 +82,7 @@ def search(replays, args):
 
 class Strategy(object):
 	timelimit_ex = re.compile('within ([0-9:]+)$')
+	building_order_collection = set((isinstance(x, tuple) and x[0] or x)  for x in tracked_building_orders)
 	def __init__(self, definition):
 		self.compile(definition.strip())
 
@@ -124,7 +125,7 @@ class Strategy(object):
 				raise InvalidQuantity(orig_item)
 			suffix = '{%s,%s}' % (low, high)
 		
-		if item not in tracked_building_orders:
+		if item not in self.building_order_collection:
 			raise InvalidBuildingOrTechnology(item) 
 
 		return '(%s#)%s' % (item, suffix)
@@ -225,6 +226,7 @@ class ReplayDB(object):
 			if last_evt and not is_duplicated_events(last_evt, evt):
 				result.append(last_evt) 
 			last_evt = evt
+		result.append(last_evt) 
 		return [(e.second, e.ability) for e in result[::-1]]
 
 class Config(object):
