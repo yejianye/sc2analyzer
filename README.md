@@ -52,4 +52,4 @@ sc2search will place a default configuration file sc2search.ini under your home 
 - rep_path: the root directory for all your replay files
 - db_path: the directory where sc2search would store all the metadata for your replays
 
-
+In sc2search.ini, you could define custom strategy which could be used for search rules. Open the configuration and play with it yourself, there're lots of inline documentation.
