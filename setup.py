@@ -10,7 +10,7 @@ setuptools.setup(
     url="https://github.com/yejianye/sc2analyzer",
 
     description="Utility for analyzing interesting events and statistics in Starcraft2 Replay files",
-    long_description=open("README.txt").read(),
+    long_description=open("README.md").read(),
     keywords=["starcraft 2","sc2","replay"],
     classifiers=[
             "Environment :: Console",
